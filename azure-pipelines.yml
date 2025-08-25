@@ -5,8 +5,8 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  resourceGroup: 'my-rg'
-  location: 'eastus'
+  resourceGroup: 'AZURE_WEBAPP'
+  location: 'Central India'
   appName: 'mywebapp$(Build.BuildId)'
 
 stages:
@@ -36,7 +36,7 @@ stages:
 
     - task: AzureCLI@2
       inputs:
-        azureSubscription: 'my-azure-connection'   # Use your service connection name
+        azureSubscription: 'AZURE_WEBAPP_SC'   # Use your service connection name
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
