@@ -7,7 +7,8 @@ pool:
 variables:
   resourceGroup: 'AZURE_WEBAPP'
   location: 'Central India'
-  appName: 'mywebapp$(Build.BuildId)'
+  appServicePlan: 'mywebappdemo-plan'
+  webAppName: 'mywebappdemo'
 
 stages:
 - stage: Build
@@ -31,16 +32,18 @@ stages:
   jobs:
   - job: DeployJob
     steps:
-    - download: current
-      artifact: drop
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: drop
+        path: $(Pipeline.Workspace)
 
     - task: AzureCLI@2
       inputs:
-        azureSubscription: 'AZURE_WEBAPP_SC'   # Your service connection name
-        scriptType: ps    # 👈 Use ps (PowerShell) if Windows agent, bash if Ubuntu
+        azureSubscription: 'AZURE_WEBAPP_SC'
+        scriptType: ps
         scriptLocation: inlineScript
         inlineScript: |
           az group create -n $(resourceGroup) -l $(location)
-          az appservice plan create -g $(resourceGroup) -n "$(appName)-plan" --sku FREE
-          az webapp create -g $(resourceGroup) -p "$(appName)-plan" -n $(appName) --runtime "PYTHON:3.9"
-          az webapp deployment source config-zip -g $(resourceGroup) -n $(appName) --src $(Pipeline.Workspace)/drop/drop.zip
+          az appservice plan create -g $(resourceGroup) -n $(appServicePlan) --sku FREE
+          az webapp create -g $(resourceGroup) -p $(appServicePlan) -n $(webAppName) --runtime "PYTHON:3.9"
+          az webapp deployment source config-zip -g $(resourceGroup) -n $(webAppName) --src $(Pipeline.Workspace)/drop/drop.zip
