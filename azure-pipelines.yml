@@ -34,24 +34,13 @@ stages:
     - download: current
       artifact: drop
 
-    - task: AzureCLI@2
-      inputs:
-        azureSubscription: 'AZURE_WEBAPP_SC'   # Use your service connection name
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          # Create Resource Group if not exists
-          az group create -n $(resourceGroup) -l $(location)
-
-          # Create App Service Plan
-          az appservice plan create -g $(resourceGroup) -n "$(appName)-plan" --sku FREE || true
-
-          # Create Web App
-          az webapp create -g $(resourceGroup) -p "$(appName)-plan" -n $(appName) --runtime "PYTHON:3.9" || true
-
-          # Deploy the zip package
-          az webapp deployment source config-zip \
-            -g $(resourceGroup) -n $(appName) \
-            --src $(Pipeline.Workspace)/drop/drop.zip
-
-          echo "✅ Deployment complete! Visit: https://$(appName).azurewebsites.net"
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'AZURE_WEBAPP_SC'
+    scriptType: ps   # 👈 instead of bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      az group create -n $(resourceGroup) -l $(location)
+      az appservice plan create -g $(resourceGroup) -n "$(appName)-plan" --sku FREE
+      az webapp create -g $(resourceGroup) -p "$(appName)-plan" -n $(appName) --runtime "PYTHON:3.9"
+      az webapp deployment source config-zip -g $(resourceGroup) -n $(appName) --src $(Pipeline.Workspace)/drop/drop.zip
