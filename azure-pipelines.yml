@@ -2,7 +2,7 @@ trigger:
 - main   # pipeline runs whenever you push to main branch
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Mypool'
 
 variables:
   resourceGroup: 'AZURE_WEBAPP'
