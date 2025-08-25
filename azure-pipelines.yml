@@ -44,6 +44,6 @@ stages:
         scriptLocation: inlineScript
         inlineScript: |
           az group create -n $(resourceGroup) -l $(location)
-          az appservice plan create -g $(resourceGroup) -n $(appServicePlan) --sku FREE
-          az webapp create -g $(resourceGroup) -p $(appServicePlan) -n $(webAppName) --runtime "PYTHON:3.9"
+          az appservice plan create -g $(resourceGroup) -n $(appServicePlan) --sku $(sku) --is-linux
+          az webapp create -g $(resourceGroup) -p $(appServicePlan) -n $(webAppName) --runtime "PYTHON|3.9"
           az webapp deployment source config-zip -g $(resourceGroup) -n $(webAppName) --src $(Pipeline.Workspace)/drop/drop.zip
